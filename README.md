@@ -1,5 +1,7 @@
 # gulp-properties-to-object
 
+Parse properties files and save in Object
+
 ## Install
 
 ```shell
