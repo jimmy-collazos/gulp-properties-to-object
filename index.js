@@ -1,6 +1,6 @@
-var parseProperties = require("./parse.js"),
-  through = require('through2'),
-  gutil = require('gulp-util')
+const parseProperties = require('./lib/parse.js');
+const through = require('through2');
+const gutil = require('gulp-util');
 
 function createError(err) {
   return new gutil.PluginError({
@@ -9,7 +9,7 @@ function createError(err) {
   });
 }
 
-function gulpi18n(db) {
+function gulpi18n(db = {}) {
   return through.obj(function(file, enc, cb) {
     if (file.isNull()) {
       cb(null, file);
@@ -17,23 +17,18 @@ function gulpi18n(db) {
     }
 
     if (file.isStream()) {
-      this.emit('error', createError('Stream content is not supported'));
-      // try {
-      //   file.contents.on('data', function (buf) {
-      //     console.log(buf);
-      //   });
-      // } catch (err) {
-      //   this.emit('error', createError(err));
-      // }
+      //@see https://nodejs.org/api/buffer.html#buffer_buf_indexof_value_byteoffset_encoding
+      //@see http://stackoverflow.com/questions/12121775/convert-streamed-buffers-to-utf8-string
+      file.contents.on('data', function (chunk) {
+        parseProperties.parse(chunk, db);
+      });
     }
 
     if (file.isBuffer()) {
-      parseProperties.parse(file.contents.toString(), db);
-      //this.push(file);
+      parseProperties.parse(file.contents, db);
     }
     cb(null, file);
   });
 }
 
-// Exporting the plugin main function
 module.exports = gulpi18n;

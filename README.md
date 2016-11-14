@@ -23,7 +23,7 @@ gulp.src("./src/*.properties")
 
 ## TODO
 
-- [ ] Stream support
+- [x] Stream support
 - [ ] export JSON
 - [ ] join all JSONs in one file
 - [ ] add benchmark

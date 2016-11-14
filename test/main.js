@@ -10,16 +10,48 @@ const task = require('../');
 const assert = require('assert');
 const path = require('path');
 
-describe('test', function () {
-  describe('build DB', function () {
-    var srcFile = new gutil.File({
-          path: path.join(__dirname, './fixtures/messages.titulo.ventanas.properties'),
-          cwd: __dirname,
-          base: path.join(__dirname, './fixtures/'),
-          contents: fs.readFileSync(path.join(__dirname, './fixtures/messages.titulo.ventanas.properties'))
-        });
+function getFile(fileReader = fs.readFileSync, fileName = 'smalldemo.properties') {
+  let filePath = path.join(__dirname, `./fixtures/${fileName}`);
+  let myFile = new gutil.File({
+    path: filePath,
+    cwd: __dirname,
+    base: path.join(__dirname, './fixtures/'),
+    contents: fileReader(filePath)
+  });
+  return myFile;
+}
 
-    it('save data in DB', function (done) {
+describe('gulp-properties-to-object', () => {
+  describe('source type', () => {
+    it('buffer', (done) => {
+      var stream = task();
+      stream.on('error', should.ifError);
+      stream.on('error', done);
+      stream.on('finish', (data) => {
+        // burn 'finish' because all is ok
+        assert.ok(true);
+        done();
+      });
+      stream.write(getFile());
+      stream.end();
+    });
+    it('stream', (done) => {
+      var stream = task();
+      stream.on('error', should.ifError);
+      stream.on('error', done);
+      stream.on('finish', () => {
+        // burn 'finish' because all is ok
+        assert.ok(true);
+        done();
+      });
+      //stream.write(getFile(fs.createReadStream, 'messages.contratacion.properties')); //, 'messages.altaclientes.properties'
+      stream.write(getFile(fs.createReadStream)); //, 'messages.altaclientes.properties'
+      stream.end();
+    });
+  });
+
+  describe('save in Object', function () {
+    it('ignore property comments', function (done) {
       var db = {};
       var stream = task(db);
       var resultKeys = [ 'INTERVINIENTES',
@@ -29,7 +61,8 @@ describe('test', function () {
         'CUENTAVALORES',
         'DOCUMENTACIONYFIRMA',
         'FINALIZAR',
-        'NEXO_TITULO' ];
+        'PROPERTY_WITH_SPACE',
+        'LAST_PROPERTY' ];
 
       stream.on('error', should.ifError);
       stream.on('error', done);
@@ -38,7 +71,7 @@ describe('test', function () {
         assert.deepStrictEqual(Object.keys(db), resultKeys);
         done();
       });
-      stream.write(srcFile);
+      stream.write(getFile());
       stream.end();
     });
   });
