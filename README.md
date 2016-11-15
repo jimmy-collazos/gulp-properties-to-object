@@ -1,6 +1,6 @@
 # gulp-properties-to-object
 
-Parse properties files and save in Object
+Parse properties files and save in memory(object)
 
 ## Install
 
@@ -23,11 +23,10 @@ gulp.src("./src/*.properties")
 
 ## TODO
 
+- [x] Trim spaces
 - [x] Stream support
-- [ ] export JSON
-- [ ] join all JSONs in one file
-- [ ] add benchmark
-- [ ] Add this project in NPM
+- [ ] Export JSON
+- [ ] Add benchmark
 - [ ] Add Travis
 - [ ] Add to Coveralls.io
 - [ ] Add to Depstat
