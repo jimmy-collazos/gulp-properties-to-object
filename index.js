@@ -1,7 +1,7 @@
 const parseProperties = require('./lib/parse.js');
 const through = require('through2');
 
-function gulpi18n(db = {}) {
+function index(db = {}) {
   return through.obj(function(file, enc, cb) {
     if (file.isNull()) {
       cb(null, file);
@@ -9,8 +9,6 @@ function gulpi18n(db = {}) {
     }
 
     if (file.isStream()) {
-      //@see https://nodejs.org/api/buffer.html#buffer_buf_indexof_value_byteoffset_encoding
-      //@see http://stackoverflow.com/questions/12121775/convert-streamed-buffers-to-utf8-string
       file.contents.on('data', function (chunk) {
         parseProperties.parse(chunk, db);
       });
@@ -23,4 +21,4 @@ function gulpi18n(db = {}) {
   });
 }
 
-module.exports = gulpi18n;
+module.exports = index;
