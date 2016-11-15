@@ -1,78 +1,114 @@
-/*global describe, it*/
-'use strict';
-
-delete require.cache[require.resolve('../')];
-require('mocha');
 const fs = require('fs');
-const should = require('should');
 const gutil = require('gulp-util');
 const task = require('../');
-const assert = require('assert');
-const path = require('path');
+const tap = require('tap');
 
-function getFile(fileReader = fs.readFileSync, fileName = 'smalldemo.properties') {
-  let filePath = path.join(__dirname, `./fixtures/${fileName}`);
-  let myFile = new gutil.File({
-    path: filePath,
-    cwd: __dirname,
-    base: path.join(__dirname, './fixtures/'),
-    contents: fileReader(filePath)
+tap.test('read Stream', (childTest) => {
+  var stream = task();
+  var fileStream = new gutil.File({
+    contents: fs.createReadStream('./test/fixtures/smalldemo.properties')
   });
-  return myFile;
-}
+  stream.on('error', childTest.ifError);
+  stream.on('finish', () => {
+    // burn 'finish' because all is ok
+    childTest.ok(true);
+    childTest.end();
+  });
+  stream.write(fileStream);
+  stream.end();
+});
 
-describe('gulp-properties-to-object', () => {
-  describe('source type', () => {
-    it('buffer', (done) => {
-      var stream = task();
-      stream.on('error', should.ifError);
-      stream.on('error', done);
-      stream.on('finish', (data) => {
-        // burn 'finish' because all is ok
-        assert.ok(true);
-        done();
-      });
-      stream.write(getFile());
-      stream.end();
-    });
-    it('stream', (done) => {
-      var stream = task();
-      stream.on('error', should.ifError);
-      stream.on('error', done);
-      stream.on('finish', () => {
-        // burn 'finish' because all is ok
-        assert.ok(true);
-        done();
-      });
-      //stream.write(getFile(fs.createReadStream, 'messages.contratacion.properties')); //, 'messages.altaclientes.properties'
-      stream.write(getFile(fs.createReadStream)); //, 'messages.altaclientes.properties'
-      stream.end();
-    });
+tap.test('read Buffer', (childTest) => {
+  var stream = task();
+  var fileStream = new gutil.File({
+    contents: new Buffer('')
+  });
+  stream.on('error', childTest.ifError);
+  stream.on('finish', () => {
+    // burn 'finish' because all is ok
+    childTest.ok(true);
+    childTest.end();
+  });
+  stream.write(fileStream);
+  stream.end();
+});
+
+tap.test('ignore line commented', (childTest) => {
+  var db = {};
+  var stream = task(db);
+  var fileStream = new gutil.File({
+    contents: new Buffer('#key=value')
+  });
+  // var resultKeys = [ 'INTERVINIENTES',
+  //   'CONDICIONES',
+  //   'CUENTAABONO',
+  //   'CUENTACARGO',
+  //   'CUENTAVALORES',
+  //   'DOCUMENTACIONYFIRMA',
+  //   'FINALIZAR',
+  //   'PROPERTY_WITH_SPACE',
+  //   'LAST_PROPERTY' ];
+
+  stream.on('error', childTest.ifError);
+  stream.on('error', childTest.end);
+
+  stream.on('finish', () => {
+    childTest.equal(Object.keys(db).length, 0);
+    childTest.end();
+  });
+  stream.write(fileStream);
+  stream.end();
+});
+tap.test('ignore line without equal character', (childTest) => {
+  var db = {};
+  var stream = task(db);
+  var fileStream = new gutil.File({
+    contents: new Buffer('key')
   });
 
-  describe('save in Object', function () {
-    it('ignore property comments', function (done) {
-      var db = {};
-      var stream = task(db);
-      var resultKeys = [ 'INTERVINIENTES',
-        'CONDICIONES',
-        'CUENTAABONO',
-        'CUENTACARGO',
-        'CUENTAVALORES',
-        'DOCUMENTACIONYFIRMA',
-        'FINALIZAR',
-        'PROPERTY_WITH_SPACE',
-        'LAST_PROPERTY' ];
+  stream.on('error', childTest.ifError);
+  stream.on('error', childTest.end);
 
-      stream.on('error', should.ifError);
-      stream.on('error', done);
-
-      stream.on('finish', (data) => {
-        assert.deepStrictEqual(Object.keys(db), resultKeys);
-        done();
-      });
-      stream.write(getFile());
-      stream.end();
-    });
+  stream.on('finish', () => {
+    childTest.equal(Object.keys(db).length, 0);
+    childTest.end();
   });
+  stream.write(fileStream);
+  stream.end();
+});
+
+tap.test('ignore line if have one character', (childTest) => {
+  var db = {};
+  var stream = task(db);
+  var fileStream = new gutil.File({
+    contents: new Buffer('=')
+  });
+
+  stream.on('error', childTest.ifError);
+  stream.on('error', childTest.end);
+
+  stream.on('finish', () => {
+    childTest.equal(Object.keys(db).length, 0);
+    childTest.end();
+  });
+  stream.write(fileStream);
+  stream.end();
+});
+
+
+tap.test('remove initial and ended spaces', (childTest) => {
+  var db = {};
+  var stream = task(db);
+  var fileStream = new gutil.File({
+    contents: new Buffer(`     attName     =    attValue       `)
+  });
+  stream.on('error', childTest.ifError);
+  stream.on('error', childTest.end);
+
+  stream.on('finish', () => {
+    childTest.equal(db.attName, 'attValue');
+    childTest.end();
+  });
+  stream.write(fileStream);
+  stream.end();
 });

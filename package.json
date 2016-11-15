@@ -15,8 +15,7 @@
   "main": "index.js",
   "repository": "https://github.com/jimmy-collazos/gulp-properties-to-object.git",
   "scripts": {
-    "test": "istanbul test _mocha --report html -- test/*.js --reporter spec",
-    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "test": "node test/main.js",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -28,10 +27,7 @@
     "coveralls": "*",
     "eslint": "^3.1.1",
     "event-stream": "*",
-    "istanbul": "*",
-    "mocha": "*",
-    "mocha-lcov-reporter": "*",
-    "should": "~2.1.0"
+    "tap": "^8.0.0"
   },
   "engines": {
     "node": ">=0.8.0",
