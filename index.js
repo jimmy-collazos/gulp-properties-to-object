@@ -1,13 +1,5 @@
 const parseProperties = require('./lib/parse.js');
 const through = require('through2');
-const gutil = require('gulp-util');
-
-function createError(err) {
-  return new gutil.PluginError({
-    plugin: 'gulp-properties-to-object',
-    message: err
-  });
-}
 
 function gulpi18n(db = {}) {
   return through.obj(function(file, enc, cb) {

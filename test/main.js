@@ -1,7 +1,7 @@
 const fs = require('fs');
 const gutil = require('gulp-util');
 const task = require('../');
-const tap = require('tap');
+const tap = require('tape');
 
 tap.test('read Stream', (childTest) => {
   var stream = task();
@@ -100,7 +100,7 @@ tap.test('remove initial and ended spaces', (childTest) => {
   var db = {};
   var stream = task(db);
   var fileStream = new gutil.File({
-    contents: new Buffer(`     attName     =    attValue       `)
+    contents: new Buffer('     attName     =    attValue       ')
   });
   stream.on('error', childTest.ifError);
   stream.on('error', childTest.end);

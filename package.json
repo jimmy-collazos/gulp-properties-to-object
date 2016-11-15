@@ -15,7 +15,9 @@
   "main": "index.js",
   "repository": "https://github.com/jimmy-collazos/gulp-properties-to-object.git",
   "scripts": {
-    "test": "node test/main.js",
+    "coverage": "istanbul cover tape -- test/main.js",
+    "test": "npm run lint && npm run coverage | tap-spec",
+    "tape": "tape test/**/*.js | faucet",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -24,10 +26,12 @@
     "through2": "*"
   },
   "devDependencies": {
-    "coveralls": "*",
     "eslint": "^3.1.1",
     "event-stream": "*",
-    "tap": "^8.0.0"
+    "tape": "^4.6.2",
+    "tap-spec": "^4.1.1",
+    "faucet": "0.0.1",
+    "istanbul": "^0.4.5"
   },
   "engines": {
     "node": ">=0.8.0",
