@@ -1,4 +1,6 @@
 # gulp-properties-to-object
+[![Build Status](https://travis-ci.org/jimmy-collazos/gulp-properties-to-object.svg?branch=master)](https://travis-ci.org/jimmy-collazos/gulp-properties-to-object)
+
 
 Parse properties files and save in memory(object)
 
