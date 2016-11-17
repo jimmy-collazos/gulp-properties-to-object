@@ -1,4 +1,4 @@
-const parseProperties = require('./lib/parse.js');
+const parse = require('./lib/parse.js');
 const through = require('through2');
 
 function index(db = {}) {
@@ -10,12 +10,12 @@ function index(db = {}) {
 
     if (file.isStream()) {
       file.contents.on('data', function (chunk) {
-        parseProperties.parse(chunk, db);
+        parse.multiline(chunk, db);
       });
     }
 
     if (file.isBuffer()) {
-      parseProperties.parse(file.contents, db);
+      parse.multiline(file.contents, db);
     }
     cb(null, file);
   });
